@@ -1,0 +1,11 @@
+@import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fix for Leaflet map tiles not loading */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
