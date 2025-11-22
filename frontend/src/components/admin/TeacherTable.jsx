@@ -1,90 +1,74 @@
 import React from 'react';
+import { FaCircle } from 'react-icons/fa';
+import BufferTimer from '../shared/BufferTimer'; // <--- Import the new timer
 
 const TeacherTable = ({ teachers }) => {
-  const getBufferTime = (bufferExpiresAt) => {
-    if (!bufferExpiresAt) return 'N/A';
-    const expires = new Date(bufferExpiresAt).getTime();
-    const now = new Date().getTime();
-    const diff = expires - now;
-
-    if (diff <= 0) return <span className="text-red-500">Expired</span>;
-
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    return (
-      <span className="text-blue-600">{`${minutes}m ${seconds}s`}</span>
-    );
+  const getStatusColor = (isOnPremises) => {
+    return isOnPremises 
+      ? 'bg-green-100 text-green-700' 
+      : 'bg-red-100 text-red-700';
   };
 
-  const formatTimestamp = (ts) => {
-    if (!ts) return 'N/A';
-    return new Date(ts).toLocaleTimeString();
+  const formatTime = (dateString) => {
+    if (!dateString) return 'Never';
+    const date = new Date(dateString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-              Name
-            </th>
-            <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-              Status
-            </th>
-            <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-              Last Seen
-            </th>
-            <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-              Buffer Window
-            </th>
-            <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {teachers.length === 0 && (
-            <tr>
-              <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
-                No teachers found.
-              </td>
+    <div className="overflow-hidden bg-white border border-gray-100 shadow-sm rounded-2xl">
+      <div className="px-6 py-4 border-b border-gray-100">
+        <h3 className="text-lg font-semibold text-gray-800">Active Teacher Roster</h3>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="text-xs font-semibold tracking-wide text-gray-500 uppercase bg-gray-50">
+              <th className="px-6 py-4">Teacher Name</th>
+              <th className="px-6 py-4">Status</th>
+              <th className="px-6 py-4">Last Log</th>
+              <th className="px-6 py-4">Buffer Window</th> {/* Renamed Header */}
             </tr>
-          )}
-          {teachers.map((teacher) => (
-            <tr key={teacher._id}>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">
-                  {teacher.name}
-                </div>
-                <div className="text-sm text-gray-500">{teacher.email}</div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {teacher.onPremises ? (
-                  <span className="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
-                    Inside
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {teachers.map((teacher) => (
+              <tr key={teacher._id} className="hover:bg-gray-50/50 transition-colors">
+                <td className="px-6 py-4">
+                  <div className="flex items-center">
+                    <div className="flex items-center justify-center w-8 h-8 mr-3 font-bold text-indigo-600 bg-indigo-100 rounded-full">
+                      {teacher.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{teacher.name}</p>
+                      <p className="text-xs text-gray-500">{teacher.email}</p>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(teacher.onPremises)}`}>
+                    <FaCircle className="w-2 h-2 mr-1.5" />
+                    {teacher.onPremises ? 'Inside Campus' : 'Outside'}
                   </span>
-                ) : (
-                  <span className="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full">
-                    Outside
-                  </span>
-                )}
-              </td>
-              <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                {formatTimestamp(teacher.lastSeen)}
-              </td>
-              <td className="px-6 py-4 text-sm whitespace-nowrap">
-                {getBufferTime(teacher.bufferExpiresAt)}
-              </td>
-              <td className="px-6 py-4 text-sm font-medium whitespace-nowrap">
-                <button className="text-indigo-600 hover:text-indigo-900">
-                  Mark Manual
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  {formatTime(teacher.lastSeen)}
+                </td>
+                <td className="px-6 py-4">
+                   {/* Use the new Live Timer Component here */}
+                   <BufferTimer expiresAt={teacher.bufferExpiresAt} />
+                </td>
+              </tr>
+            ))}
+            {teachers.length === 0 && (
+              <tr>
+                <td colSpan="4" className="px-6 py-8 text-center text-gray-400">
+                  No teachers found in the system.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
