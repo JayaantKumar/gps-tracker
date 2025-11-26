@@ -11,7 +11,7 @@ A full-stack automated attendance solution that replaces manual logs with GPS-ba
 ## 📸 Screenshots
 
 ### Admin Command Center
-![Admin Dashboard](./screenshots/admin-dashboard.png)
+![Admin Dashboard](./screenshots/admin-dashboard-1.png)
 *Real-time map view of all staff members with live status updates.*
 
 ### Teacher Interface
