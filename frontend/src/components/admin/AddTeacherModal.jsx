@@ -26,7 +26,6 @@ const AddTeacherModal = ({ isOpen, onClose, onSuccess }) => {
   };
 
   return (
-    /* FIXED: Changed z-50 to z-[9999] to sit on top of Leaflet Map */
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 m-4 relative">
         <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
